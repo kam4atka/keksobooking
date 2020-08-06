@@ -20,8 +20,8 @@ let getMockData = function (lengthArray, mapWidth) {
 
   let getArrayPhoto = function (lengthArray) {
     let array = [];
-    for (let i = 0; i < lengthArray; i++) {
-      array.push(TemplateString.PHOTO_URL + i + TemplateString.PHOTO_TYPE);
+    for (let i = 1; i <= lengthArray; i++) {
+      array.push(TemplateString.PHOTO_URL + getRandomNumber(1, 3) + TemplateString.PHOTO_TYPE);
     }
     return array;
   };
@@ -86,13 +86,91 @@ let generatePins = function (data) {
   return fragment;
 };
 
+let generateCard = function (author) {
+
+  let Card = {
+    TEMPLATE_ID: '#card',
+    ELEMENT_CLASS: '.popup',
+    ELEMENT_TITLE_CLASS: '.popup__title',
+    ELEMENT_ADDRESS_CLASS: '.popup__text--address',
+    ELEMENT_PRICE_CLASS: '.popup__text--price',
+    ELEMENT_TYPE_CLASS: '.popup__type',
+    ELEMENT_CAPACITY_CLASS: '.popup__text--capacity',
+    ELEMENT_TIME_CLASS: '.popup__text--time',
+    ELEMENT_FEATURES_CLASS: '.popup__features',
+    ELEMENT_FEATURE_CLASS: 'popup__feature',
+    ELEMENT_DESCRIPTION_CLASS: '.popup__description',
+    ELEMENT_PHOTO_CLASS: '.popup__photos',
+    ELEMENT_AVATAR: '.popup__avatar'
+  };
+
+  let TemplateString = {
+    PRICE: '₽/ночь',
+    TYPE: {
+      flat: 'Квартира',
+      bungalo: 'Бунгало',
+      house: 'Дом',
+      palace: 'Дворец'
+    },
+    ROOM: 'комнаты для',
+    GUEST: 'гостей',
+    CHECKIN: 'Заезд после',
+    CHECKOUT: ', выезд до'
+  };
+
+  let setFeatures = function (block, list, elementClass) {
+    let listElement = block.querySelectorAll('li');
+
+    Array.from(listElement).forEach(item => item.remove());
+    
+    list.forEach(item => {
+      let element = document.createElement('li');
+      element.classList.add(elementClass);
+      element.classList.add(elementClass + '--' + item);
+      block.appendChild(element);
+    })
+  };
+
+  let setPhotos = function (block, list) {
+    let listElement = block.querySelectorAll('img');
+    let imgTemplate = listElement[0];
+
+    Array.from(listElement).forEach(item => item.remove());
+
+    list.forEach(item => {
+      let element = imgTemplate.cloneNode(true);
+      element.src = item;
+      block.appendChild(element);
+    })
+  };
+
+  let fragment = document.createDocumentFragment();
+  let nodeTemplate = document.querySelector(Card.TEMPLATE_ID).content;
+  let node = nodeTemplate.cloneNode(true);
+
+  node.querySelector(Card.ELEMENT_TITLE_CLASS).textContent = author.offer.title;
+  node.querySelector(Card.ELEMENT_ADDRESS_CLASS).textContent = author.offer.address;
+  node.querySelector(Card.ELEMENT_PRICE_CLASS).textContent = author.offer.price + ' ' + TemplateString.PRICE;
+  node.querySelector(Card.ELEMENT_TYPE_CLASS).textContent = TemplateString.TYPE[author.offer.type];
+  node.querySelector(Card.ELEMENT_CAPACITY_CLASS).textContent = author.offer.rooms + ' ' + TemplateString.ROOM + ' ' + author.offer.guests + ' ' + TemplateString.GUEST;
+  node.querySelector(Card.ELEMENT_TIME_CLASS).textContent = TemplateString.CHECKIN + ' ' + author.offer.checkin + TemplateString.CHECKOUT + ' ' + author.offer.checkout;
+  node.querySelector(Card.ELEMENT_DESCRIPTION_CLASS).textContent = author.offer.description;
+  node.querySelector(Card.ELEMENT_AVATAR).src = author.avatar;
+  setFeatures(node.querySelector(Card.ELEMENT_FEATURES_CLASS), author.offer.features, Card.ELEMENT_FEATURE_CLASS);
+  setPhotos(node.querySelector(Card.ELEMENT_PHOTO_CLASS), author.offer.photos);
+  fragment.appendChild(node);
+
+  return fragment;
+};
+
 let init = function () {
 
   let MOCKDATA_LENGTH = 8;
   
   let Element = {
     MAP_CLASS: '.map',
-    MAP_CLASS_FADED: 'map--faded'
+    MAP_CLASS_FADED: 'map--faded',
+    MAP_FILTER: '.map__filters-container'
   };
 
   let mapElement = document.querySelector(Element.MAP_CLASS);
@@ -100,7 +178,10 @@ let init = function () {
 
   let mapElementWidth = mapElement.offsetWidth;
 
-  mapElement.appendChild(generatePins(getMockData(MOCKDATA_LENGTH, mapElementWidth)));
+  let mockData = getMockData(MOCKDATA_LENGTH, mapElementWidth);
+  
+  mapElement.appendChild(generatePins(mockData)); 
+  mapElement.insertBefore(generateCard(mockData[0]), mapElement.querySelector(Element.MAP_FILTER));
 };
 
 window.addEventListener('load', init);
