@@ -165,7 +165,7 @@ let generateCard = function (author) {
 
 let init = function () {
 
-  let MOCKDATA_LENGTH = 8;
+  const MOCKDATA_LENGTH = 8;
   
   let Element = {
     MAP_CLASS: '.map',
