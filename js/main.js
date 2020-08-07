@@ -72,16 +72,16 @@ let generatePins = function (data) {
   let fragment = document.createDocumentFragment();
   let nodeTemplate = document.querySelector(Pin.TEMPLATE_ID).content;
 
-  for (let i = 0; i < data.length; i++) {
+  data.forEach(item => {
     let node = nodeTemplate.cloneNode(true);
     let pinElement = node.querySelector(Pin.ELEMENT_CLASS);
-    pinElement.style.left = data[i].location.x - (Pin.WIDTH / 2) + 'px';
-    pinElement.style.top = data[i].location.y - Pin.HEIGHT + 'px';
+    pinElement.style.left = item.location.x - (Pin.WIDTH / 2) + 'px';
+    pinElement.style.top = item.location.y - Pin.HEIGHT + 'px';
     let imgElement = pinElement.querySelector('img');
-    imgElement.src = data[i].avatar;
-    imgElement.alt = data[i].offer.title;
+    imgElement.src = item.avatar;
+    imgElement.alt = item.offer.title;
     fragment.appendChild(node);
-  }
+  })
 
   return fragment;
 };
